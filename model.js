@@ -1,6 +1,5 @@
 const mongoose = require("mongoose")
 
-const timestamp = new Date()
 const userSchema = new mongoose.Schema({
     name : {
         type:String,
@@ -14,12 +13,24 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    chatList : [{
+    chatListId:[mongoose.SchemaTypes.ObjectId],
+    newConversation : [{
         type : mongoose.SchemaTypes.ObjectId,
         ref : "users"
-        }],
+    }],
+    chatList:[{
+        _id:mongoose.SchemaTypes.ObjectId,
+        name:String,
+        profilePicture:String,
+        newMessage:Number,
+        
+    }],
     temporary : String,
-    profilePicture:String
+    profilePicture:String,
+    newMessage:Number,
+    offlineTime:Number,
+    updatedAt:Number,
+    
 },{timestamps:true})
 
 let users = mongoose.model("users",userSchema)
@@ -27,7 +38,11 @@ let users = mongoose.model("users",userSchema)
 const conversationSchema = new mongoose.Schema({
     members : [mongoose.SchemaTypes.ObjectId],
     sender : mongoose.SchemaTypes.ObjectId,
-    message : String
+    message : String,
+    status : {
+        type : String,
+        default : "Delivered"
+    }
 },{timestamps:true})
 
 let conversations = mongoose.model("conversations",conversationSchema)
