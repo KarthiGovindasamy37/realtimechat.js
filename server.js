@@ -19,7 +19,9 @@ const PASS = process.env.PASS
 mongoose.set("strictQuery",false)
 mongoose.connect(URL)
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin : "https://imaginative-semifreddo-086b75.netlify.app"
+}))
 
 const sendEmail = async(req,res,temp) =>{
     try {
@@ -62,7 +64,7 @@ app.post("/register",async(req,res) =>{req.body
         }else{
             res.status(409).json({message:"Already an user registered with this email id"})
         }
-    } catch (error) {console.log(error);
+    } catch (error) {
          res.status(500).json({message:"Something went wrong,Please try again"})
     }
 })
@@ -83,7 +85,7 @@ app.post("/login",async(req,res) =>{
         }else{
             res.status(401).json({message:"Email id or password is incorrect"})
         }
-    } catch (error) {console.log(error);
+    } catch (error) {
         res.status(500).json({message:"Something went wrong,Please try again"})
     }
 })
@@ -153,16 +155,16 @@ app.get("/searchFriends/:name",async(req,res) =>{
     }
 })
 
-app.post("/addMessage",async(req,res) => { console.log("Mess",req.body.messageDetails)
+app.post("/addMessage",async(req,res) => { 
     try { 
         let addMessage = await conversations.create(req.body.messageDetails)
 
         let {message,sender,createdAt,_id,status} = addMessage
 
         let messageDetails = { message,sender,createdAt,_id,tempId:req.body.tempId,status,timestamp:Date.now(createdAt)}
-        console.log(messageDetails);
+        
         res.json(messageDetails)
-    } catch (error) {console.log(error);
+    } catch (error) {
         res.status(500).json({message:"Something went wrong,Please try again"})
     }
 })
@@ -171,8 +173,7 @@ app.get("/chatList/:userId",async(req,res) =>{
     try {
         
         let entries = await conversations.find({members:{$in:[req.params.userId]}},{_id:0,members:1,createdAt:1,status:1,sender:1})
-        // console.log(entries);
-
+        
         let newConversationList = []
 
         entries.forEach(e =>{
@@ -233,7 +234,7 @@ app.get("/chatList/:userId",async(req,res) =>{
         await user.save()
 
         let populateUser = await users.findById(req.params.userId).populate("newConversation",["name","profilePicture"])
-// console.log("1",populateUser.newConversation);
+
         newConversationList.forEach((e,i) =>{
             if(e.newMessage){
                 populateUser.newConversation[i].newMessage = e.newMessage
@@ -242,7 +243,7 @@ app.get("/chatList/:userId",async(req,res) =>{
                 populateUser.newConversation[i].updatedAt = e.updatedAt
             }
         })
-        // console.log("2",populateUser.newConversation);
+        
         res.json(populateUser.newConversation)
 
         // let newConversationList = []
@@ -353,7 +354,7 @@ app.get("/chatList/:userId",async(req,res) =>{
     //     res.json(user.chatList)
     //    }
      
-    } catch (error) {console.log(error)
+    } catch (error) {
         res.status(500).json({message:"Something went wrong,Please try again"})
     }
 })
@@ -373,11 +374,11 @@ app.get("/getMessages",async(req,res) => {
     }
 })
 
-app.put("/orderChatlist",async(req,res) =>{console.log(req.body);
+app.put("/orderChatlist",async(req,res) =>{
     try {
         let user = await users.findById(req.body.userId)
         let index = user.chatList.findIndex(e => String(e._id) === req.body.chat._id)
-        console.log(index);
+        
         if(index === -1){
         user.chatList.unshift(req.body.chat)
         }else{
@@ -392,7 +393,7 @@ app.put("/orderChatlist",async(req,res) =>{console.log(req.body);
     }
 })
 
-app.put("/clearNotification",async(req,res) =>{ console.log(req.body)
+app.put("/clearNotification",async(req,res) =>{ 
     try {
         req.body.forEach(async(e) =>{
             let conversation = await conversations.findById(e)
@@ -406,13 +407,13 @@ app.put("/clearNotification",async(req,res) =>{ console.log(req.body)
     }
 })
 
-app.put("/createOfflineTime",async(req,res) =>{ console.log("offline");console.log(req.body);
+app.put("/createOfflineTime",async(req,res) =>{ 
     try {
         let user = await users.findById(req.body.userId)
         user.offlineTime = req.body.time
         
         await user.save()
-    } catch (error) {console.log(error);
+    } catch (error) {
         res.status(500).json({message:"Something went wrong,Please try again"})
     }
 })
