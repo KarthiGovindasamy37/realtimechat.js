@@ -50,7 +50,7 @@ const sendEmail = async(req,res,temp) =>{
     }
 }
 
-app.post("/register",async(req,res) =>{req.body
+app.post("/register",async(req,res) =>{
     try {
         let user = await users.findOne({email:req.body.email})
         if(!user){
@@ -58,7 +58,7 @@ app.post("/register",async(req,res) =>{req.body
           let hash = await bcrypt.hash(req.body.password,salt)
           req.body.password = hash
 
-         let user = await users.create(req.body)
+          await users.create(req.body)
         
           res.json({message:"Account created successfully"})
         }else{
