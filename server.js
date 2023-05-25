@@ -20,7 +20,7 @@ mongoose.set("strictQuery",false)
 mongoose.connect(URL)
 app.use(express.json())
 app.use(cors({
-    origin : "https://imaginative-semifreddo-086b75.netlify.app"
+    origin : "https://merry-axolotl-091b76.netlify.app"
 }))
 
 const sendEmail = async(req,res,temp) =>{
